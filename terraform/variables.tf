@@ -27,3 +27,15 @@ variable "availability_zones" {
   description = "Lista de zonas de disponibilidad"
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
+
+# Configuracion de EKS
+variable "cluster_name" {
+  description = "Nombre del clúster EKS"
+  type        = string
+}
+
+variable "cluster_version" {
+  description = "Versión del clúster EKS"
+  type        = string
+}
+
