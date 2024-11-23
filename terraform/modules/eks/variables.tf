@@ -24,6 +24,17 @@ variable "cluster_version" {
   default     = "1.31"
 }
 
+variable "role_arn" {
+  description = "ARN del rol IAM asociado a los nodos"
+  type        = string
+}
+
+variable "authentication_mode" {
+  description = "Modo de autenticación del clúster EKS (API o ConfigMap)"
+  type        = string
+  default     = "API"
+}
+
 variable "cluster_endpoint_public_access" {
   description = "Habilitar acceso público al endpoint del clúster"
   type        = bool
@@ -56,6 +67,12 @@ variable "eks_managed_node_groups" {
     additional_tags  = optional(map(string))
   }))
   default = {}
+}
+
+variable "update_max_unavailable" {
+  description = "Número máximo de nodos no disponibles durante las actualizaciones del grupo de nodos"
+  type        = number
+  default     = 1
 }
 
 variable "node_role_arn" {

@@ -13,6 +13,9 @@ module "eks" {
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
+  role_arn        = data.aws_iam_role.labrole-arn.arn
+
+  authentication_mode = "API"
 
   # Conexion a la red
   vpc_id          = module.vpc.vpc_id
@@ -22,7 +25,7 @@ module "eks" {
   cluster_endpoint_public_access  = false
   cluster_endpoint_private_access = true
 
-  node_role_arn = "arn:aws:iam::548951595836:role/LabRole"
+  node_role_arn = data.aws_iam_role.labrole-arn.arn
 
   eks_managed_node_groups = {
     default_group = {
