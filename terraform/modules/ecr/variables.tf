@@ -3,7 +3,6 @@
 variable "ecr_repository_name" {
   description = "Nombre del repositorio de Elastic Container Registry (ECR)"
   type        = string
-  default     = "custom-repository-name"
 }
 
 variable "ecr_scan_on_push" {
@@ -30,15 +29,4 @@ variable "team" {
   default     = "BackendTeam"
 }
 
-variable "namespace_parameter_name" {
-  description = "Nombre del parámetro en SSM para el namespace de la aplicación"
-  type        = string
-  default     = "/namespaces/online-boutique"
-}
-
-variable "namespace_value" {
-  description = "Valor asociado al parámetro del namespace en SSM"
-  type        = string
-  default     = "staging"
-}
 
