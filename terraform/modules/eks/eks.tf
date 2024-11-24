@@ -23,11 +23,21 @@ resource "aws_eks_cluster" "this" {
 
 resource "aws_eks_access_entry" "example" {
   cluster_name      = var.cluster_name
-  principal_arn     = "arn:aws:iam::548951595836:role/voclabs"
-  user_name         = "arn:aws:sts::548951595836:assumed-role/voclabs/{{SessionName}}"
+  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/voclabs"
+  user_name     = "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/voclabs/{{SessionName}}"
+#  kubernetes_groups = ["system:masters"]
   type              = "STANDARD"
 }
 
+resource "aws_eks_access_policy_association" "example" {
+  cluster_name  = var.cluster_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/voclabs"
+
+  access_scope {
+    type       = "cluster"
+  }
+}
 
 # Cluster Add-ons
 resource "aws_eks_addon" "coredns" {
