@@ -42,8 +42,8 @@ module "eks" {
 }
 
 module "ecr" {
-  source               = "./modules/ecr"
+  source = "./modules/ecr"
 
-  ecr_repository_name  = var.ecr_repository_name
+  ecr_repository_name = var.ecr_repository_name
+}
 
-  

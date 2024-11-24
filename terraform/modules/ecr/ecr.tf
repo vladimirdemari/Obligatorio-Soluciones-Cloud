@@ -26,22 +26,23 @@ resource "aws_ecr_lifecycle_policy" "app_lifecycle_policy" {
 
   # Especifica las reglas de la política usando JSON
   policy = <<EOF
-  {
+{
     "rules": [
       {
         "rulePriority": 1,
         "description": "Eliminar imágenes no usadas después de 30 días",
-        "selection": = {
+        "selection": {
           "tagStatus": "untagged",
           "countType": "imageCountMoreThan",  
           "countNumber": 5
         },
         "action": {
-          "type": = "expire"  # Marca las imágenes seleccionadas para ser eliminadas
+          "type": "expire" 
         }
       }
     ]
-  })
+}
+EOF
 }
 
   # Etiquetas para organizar el recurso y asociarlo con su entorno y equipo
