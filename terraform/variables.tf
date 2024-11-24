@@ -39,3 +39,8 @@ variable "cluster_version" {
   type        = string
 }
 
+variable "ecr_repository_name" {
+  description = "Nombre del repositorio de Elastic Container Registry (ECR)"
+  type        = string
+  default     = "custom-repository-name"
+}
