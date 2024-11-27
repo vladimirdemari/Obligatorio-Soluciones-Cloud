@@ -1,10 +1,14 @@
 # Crea un repositorio en Elastic Container Registry (ECR)
 resource "aws_ecr_repository" "app_repository" {
+
+  for_each = toset(var.ecr_repositories_names)
+
   # Nombre del repositorio, definido mediante una variable
-  name = var.ecr_repository_name
+  name = each.value
 
   # Configuración para escanear automáticamente las imágenes en busca de vulnerabilidades
   image_scanning_configuration {
+
     # Habilita o deshabilita el escaneo automático al momento de subir las imágenes
     scan_on_push = var.ecr_scan_on_push
   }
@@ -21,8 +25,11 @@ resource "aws_ecr_repository" "app_repository" {
 
 # Define una política de ciclo de vida para administrar las imágenes dentro del repositorio
 resource "aws_ecr_lifecycle_policy" "app_lifecycle_policy" {
+
+  for_each = aws_ecr_repository.app_repository
+
   # Vincula la política al repositorio creado anteriormente
-  repository = aws_ecr_repository.app_repository.name
+  repository = each.value.name
 
   # Especifica las reglas de la política usando JSON
   policy = <<EOF

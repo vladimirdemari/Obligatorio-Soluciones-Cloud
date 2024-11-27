@@ -1,8 +1,6 @@
-
-
-variable "ecr_repository_name" {
-  description = "Nombre del repositorio de Elastic Container Registry (ECR)"
-  type        = string
+variable "ecr_repositories_names" {
+  description = "Nombres de repositorios para Elastic Container Registry (ECR)"
+  type        = list(string)
 }
 
 variable "ecr_scan_on_push" {

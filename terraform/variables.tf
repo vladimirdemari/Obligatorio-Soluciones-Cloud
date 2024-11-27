@@ -39,8 +39,13 @@ variable "cluster_version" {
   type        = string
 }
 
-variable "ecr_repository_name" {
-  description = "Nombre del repositorio de Elastic Container Registry (ECR)"
-  type        = string
-  default     = "custom-repository-name"
+variable "applications" {
+  description = "Componentes del proyecto"
+  type        = list(string)
 }
+
+variable "commit_short_sha" {
+  description = "Identificador sha corto del commit actual"
+  type       = string
+}
+
