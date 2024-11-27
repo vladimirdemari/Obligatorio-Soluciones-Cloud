@@ -44,6 +44,15 @@ module "eks" {
 module "ecr" {
   source = "./modules/ecr"
 
-  ecr_repository_name = var.ecr_repository_name
+  ecr_repositories_names = var.applications
+}
+
+
+module "docker_build_push" {
+  source = "./modules/docker"
+
+  applications = var.applications
+  registry_url = module.ecr.registry_url
+  commit_short_sha = var.commit_short_sha  
 }
 
