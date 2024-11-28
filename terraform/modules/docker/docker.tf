@@ -9,11 +9,10 @@ resource "docker_image" "build" {
     context    = "../boutique-online/src/${each.key}"
   }
 
-  # Incluye un hash explícito para detectar cambios
-  keep_locally = false
-    triggers = {
-      context_hash = filesha256("../boutique-online/src/${each.key}")
-    }
+  # Solo se reconstruye si cambia el commit_short_sha
+  triggers = {
+    commit_sha = var.commit_short_sha
+  }
 }
 
 # Crear un tag adicional `latest` para cada imagen
