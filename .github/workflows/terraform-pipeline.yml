@@ -26,6 +26,23 @@ jobs:
       TF_VAR_docker_url: ${{ vars.TF_VAR_docker_url }}
 
     steps:
+      - name: Debug Terraform Variables
+        run: |
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
+          echo "TF_VAR_aws_region=$TF_VAR_aws_region"
+          echo "TF_VAR_environment_name=$TF_VAR_environment_name"
+          echo "TF_VAR_vpc_cidr=$TF_VAR_vpc_cidr"
+          echo "TF_VAR_public_subnet_cidrs=$TF_VAR_public_subnet_cidrs"
+          echo "TF_VAR_private_subnet_cidrs=$TF_VAR_private_subnet_cidrs"
+          echo "TF_VAR_availability_zones=$TF_VAR_availability_zones"
+          echo "TF_VAR_cluster_name=$TF_VAR_cluster_name"
+          echo "TF_VAR_cluster_version=$TF_VAR_cluster_version"
+          echo "TF_VAR_applications=$TF_VAR_applications"
+          echo "TF_VAR_commit_short_sha=$TF_VAR_commit_short_sha"
+          echo "TF_VAR_docker_url=$TF_VAR_docker_url"
+
       # 1. Checkout Repository
       - name: Checkout repository
         uses: actions/checkout@v3
