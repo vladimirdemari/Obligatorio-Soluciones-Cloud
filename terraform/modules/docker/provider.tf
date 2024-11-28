@@ -11,7 +11,7 @@ provider "docker" {
   host = "unix:///var/run/docker.sock"
 
   registry_auth {
-    address     = var.docker_url
+    address     = var.registry_url
     config_file = pathexpand("~/.docker/config.json")
   }
 }
