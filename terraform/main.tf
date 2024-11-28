@@ -26,7 +26,7 @@ module "eks" {
   private_subnets = module.vpc.private_subnets
   public_subnets  = module.vpc.public_subnets
 
-  cluster_endpoint_public_access  = false
+  cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
 
   node_role_arn = data.aws_iam_role.labrole-arn.arn
