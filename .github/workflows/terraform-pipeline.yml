@@ -1,9 +1,9 @@
 name: Terraform Infrastructure Deployment
 
 on:
-  push:
-    branches:
-      - test
+#  push:
+#    branches:
+#      - test
   workflow_dispatch:
 
 jobs:
@@ -139,7 +139,7 @@ jobs:
   create-private-runner:
     name: Create Private Runner
     runs-on: ubuntu-latest
-    needs: terraform-deploy
+#    needs: terraform-deploy
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -197,7 +197,6 @@ jobs:
       - name: Launch EC2 Instance with User Data
         id: launch-ec2
         run: |
-          # Script de inicialización para configurar el runner automáticamente
           USER_DATA=$(cat <<EOF
           #!/bin/bash
           set -e
@@ -205,8 +204,6 @@ jobs:
           sudo apt-get install -y docker.io git jq
           sudo systemctl start docker
           sudo systemctl enable docker
-
-          # Configurar GitHub Runner
           mkdir actions-runner && cd actions-runner
           curl -o actions-runner-linux-x64-2.321.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
           tar xzf actions-runner-linux-x64-2.321.0.tar.gz
@@ -215,9 +212,8 @@ jobs:
           ./svc.sh start
           EOF
           )
-
           INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0dba2cb6798deb6d8 \ # Ubuntu Server 20.04 LTS
+            --image-id ami-0dba2cb6798deb6d8 \
             --count 1 \
             --instance-type $INSTANCE_TYPE \
             --subnet-id $SUBNET_ID \
@@ -227,6 +223,4 @@ jobs:
             --query 'Instances[0].InstanceId' \
             --output text)
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-
-          # Esperar a que la instancia esté lista
           aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
