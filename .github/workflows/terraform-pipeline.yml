@@ -107,7 +107,7 @@ jobs:
       TF_VAR_applications: ${{ vars.TF_VAR_applications }}
       TF_VAR_commit_short_sha: ${{ vars.TF_VAR_commit_short_sha }}
       TF_VAR_docker_url: ${{ vars.TF_VAR_docker_url }}
-      TF_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
+      TF_VAR_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
 
     steps:
       - name: Verify Docker Installation
@@ -117,7 +117,7 @@ jobs:
       - name: Authenticate Docker with ECR
         run: |
           echo "Authenticating with ECR at $ECR_URL"
-          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "$TF_REGISTRY_URL"
+          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "$TF_VAR_REGISTRY_URL"
 
       - name: Checkout Repository
         uses: actions/checkout@v3
