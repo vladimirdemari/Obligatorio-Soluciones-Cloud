@@ -17,7 +17,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: <IMAGE:TAG>
+          image: ${TF_VAR_REGISTRY_URL}/${COMPONENT}:latest
           ports:
           - containerPort: 8080
           readinessProbe:
