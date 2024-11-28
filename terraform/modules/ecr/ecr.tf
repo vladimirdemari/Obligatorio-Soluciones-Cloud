@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 # Crea un repositorio en Elastic Container Registry (ECR)
 resource "aws_ecr_repository" "app_repository" {
 
