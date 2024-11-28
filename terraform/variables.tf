@@ -1,6 +1,6 @@
 variable "aws_region" {
   description = "Región de AWS"
-  type        = list(string)
+  type        = string
 }
 
 variable "environment_name" {
@@ -10,7 +10,7 @@ variable "environment_name" {
 
 variable "vpc_cidr" {
   description = "CIDR para la VPC"
-  type        = list(string)
+  type        = string
 }
 
 variable "public_subnet_cidrs" {
