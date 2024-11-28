@@ -22,11 +22,16 @@ jobs:
       - name: Check if S3 Bucket Exists
         run: |
           BUCKET_NAME="my-terraform-state-bucket"
+          REGION="${{ vars.TF_VAR_aws_region }}"
           if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             echo "Bucket $BUCKET_NAME already exists. Skipping creation."
           else
             echo "Bucket $BUCKET_NAME does not exist. Creating..."
-            aws s3api create-bucket --bucket "$BUCKET_NAME" --region ${{ vars.TF_VAR_aws_region }} --create-bucket-configuration LocationConstraint=${{ vars.TF_VAR_aws_region }}
+            if [ "$REGION" == "us-east-1" ]; then
+              aws s3api create-bucket --bucket "$BUCKET_NAME"
+            else
+              aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
+            fi
             aws s3api put-bucket-versioning --bucket "$BUCKET_NAME" --versioning-configuration Status=Enabled
             aws s3api put-bucket-encryption --bucket "$BUCKET_NAME" --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
           fi
