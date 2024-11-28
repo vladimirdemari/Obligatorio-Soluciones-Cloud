@@ -20,9 +20,10 @@ jobs:
           aws-region: ${{ vars.TF_VAR_aws_region }}
 
       - name: Check if S3 Bucket Exists
+        env:
+          BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          REGION: ${{ vars.TF_VAR_aws_region }}
         run: |
-          BUCKET_NAME="my-terraform-state-bucket"
-          REGION="${{ vars.TF_VAR_aws_region }}"
           if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             echo "Bucket $BUCKET_NAME already exists. Skipping creation."
           else
