@@ -1,14 +1,30 @@
 name: Terraform Infrastructure Deployment
 
 on:
-  push:
-    branches:
-      - test
+#  push:
+#    branches:
+#      - test
   workflow_dispatch:
 
 jobs:
   terraform-deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
+      TF_VAR_environment_name: ${{ vars.TF_VAR_environment_name }}
+      TF_VAR_vpc_cidr: ${{ vars.TF_VAR_vpc_cidr }}
+      TF_VAR_public_subnet_cidrs: ${{ vars.TF_VAR_public_subnet_cidrs }}
+      TF_VAR_private_subnet_cidrs: ${{ vars.TF_VAR_private_subnet_cidrs }}
+      TF_VAR_availability_zones: ${{ vars.TF_VAR_availability_zones }}
+      TF_VAR_cluster_name: ${{ vars.TF_VAR_cluster_name }}
+      TF_VAR_cluster_version: ${{ vars.TF_VAR_cluster_version }}
+      TF_VAR_applications: ${{ vars.TF_VAR_applications }}
+      TF_VAR_commit_short_sha: ${{ vars.TF_VAR_commit_short_sha }}
+      TF_VAR_docker_url: ${{ vars.TF_VAR_docker_url }}
+
     steps:
       # 1. Checkout Repository
       - name: Checkout repository
@@ -23,23 +39,13 @@ jobs:
       # 3. Initialize Terraform
       - name: Terraform Init
         working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform init
 
       # 4. Plan Terraform Changes
       - name: Terraform Plan
         working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform plan -var-file="variables.tfvars"
 
-      # 5. Apply Terraform Changes
       - name: Terraform Apply
         working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform apply -auto-approve -var-file="variables.tfvars"
+        run: terraform apply -auto-approve
