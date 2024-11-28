@@ -1,7 +1,7 @@
 # Crea un repositorio en Elastic Container Registry (ECR)
 resource "aws_ecr_repository" "app_repository" {
 
-  for_each = toset(var.ecr_repositories_names)
+  for_each = toset(var.applications)
 
   # Nombre del repositorio, definido mediante una variable
   name = each.value

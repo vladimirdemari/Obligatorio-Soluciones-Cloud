@@ -13,7 +13,3 @@ variable "commit_short_sha" {
   type        = string
 }
 
-variable "registry_url" {
-  description = "The Docker registry address"
-  type        = string
-}

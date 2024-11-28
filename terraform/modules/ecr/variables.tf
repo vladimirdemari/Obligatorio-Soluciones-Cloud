@@ -1,4 +1,4 @@
-variable "ecr_repositories_names" {
+variable "applications" {
   description = "Nombres de repositorios para Elastic Container Registry (ECR)"
   type        = list(string)
 }
