@@ -12,7 +12,7 @@ variable "ecr_scan_on_push" {
 variable "ecr_tag_mutability" {
   description = "Define si las etiquetas de imágenes son mutables (MUTABLE) o no (IMMUTABLE)"
   type        = string
-  default     = "MUTABLE"
+  default     = "IMMUTABLE"
 }
 
 variable "environment" {

@@ -51,8 +51,9 @@ module "ecr" {
 module "docker_build_push" {
   source = "./modules/docker"
 
-  applications = var.applications
-  registry_url = module.ecr.registry_url
-  commit_short_sha = var.commit_short_sha  
+  applications     = module.ecr.repositories
+  registry_url     = module.ecr.registry_url
+  commit_short_sha = var.commit_short_sha
+  docker_url       = var.docker_url
 }
 

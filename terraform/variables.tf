@@ -46,6 +46,10 @@ variable "applications" {
 
 variable "commit_short_sha" {
   description = "Identificador sha corto del commit actual"
-  type       = string
+  type        = string
 }
 
+variable "docker_url" {
+  description = "The Docker registry address"
+  type        = string
+}
