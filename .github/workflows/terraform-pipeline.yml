@@ -8,7 +8,7 @@ on:
 
 jobs:
   setup-state-storage:
-    name: Setup S3 and DynamoDB for Terraform State
+    name: Setup S3 and DynamoDB
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
@@ -17,7 +17,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          region: ${{ vars.TF_VAR_aws_region }}
+          aws-region: ${{ vars.TF_VAR_aws_region }}
 
       - name: Check if S3 Bucket Exists
         run: |
