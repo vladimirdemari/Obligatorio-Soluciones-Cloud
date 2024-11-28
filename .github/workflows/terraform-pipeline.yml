@@ -176,7 +176,11 @@ jobs:
       - name: Deploy applications
         working-directory: ./boutique-online/src
         env:
-          TF_VAR_APPLICATIONS: '["cartservice","frontend","recommendationservice"]'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
+          TF_VAR_applications: ${{ vars.TF_VAR_applications }}
           TF_VAR_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
         run: |
           make deploy
