@@ -136,7 +136,7 @@ jobs:
 
       - name: Plan Terraform Changes
         working-directory: terraform
-        run: terraform plan
+        run: terraform plan -var="registry_url=${{ needs.setup-ecr.outputs.registry_url }}"
 
       - name: Apply Terraform Changes
         working-directory: terraform
