@@ -176,38 +176,18 @@ jobs:
             --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)
 
           if [ -z "$SECURITY_GROUP_ID" ]; then
+            # Crear un Security Group si no existe
             SECURITY_GROUP_ID=$(aws ec2 create-security-group \
               --group-name github-runner-sg \
               --description "Security group for GitHub Runner" \
               --vpc-id ${{ needs.terraform-deploy.outputs.vpc_id }} \
               --query 'GroupId' --output text)
-          fi
 
-          # Comprobar y configurar reglas de ingreso para puerto 443
-          EXISTS_443=$(aws ec2 describe-security-groups \
-            --group-ids $SECURITY_GROUP_ID \
-            --query "SecurityGroups[0].IpPermissions[?FromPort==443 && ToPort==443].UserIdGroupPairs[?GroupId=='$SECURITY_GROUP_ID']" \
-            --output text)
-
-          if [ -z "$EXISTS_443" ]; then
-            aws ec2 authorize-security-group-ingress \
+            # Configurar reglas de egreso para permitir todo el tráfico saliente
+            aws ec2 authorize-security-group-egress \
               --group-id $SECURITY_GROUP_ID \
-              --protocol tcp \
-              --port 443 \
-              --source-group $SECURITY_GROUP_ID
-          fi
-
-          # Comprobar y configurar reglas de ingreso para puerto 22
-          EXISTS_22=$(aws ec2 describe-security-groups \
-            --group-ids $SECURITY_GROUP_ID \
-            --query "SecurityGroups[0].IpPermissions[?FromPort==22 && ToPort==22].IpRanges[?CidrIp=='0.0.0.0/0']" \
-            --output text)
-
-          if [ -z "$EXISTS_22" ]; then
-            aws ec2 authorize-security-group-ingress \
-              --group-id $SECURITY_GROUP_ID \
-              --protocol tcp \
-              --port 22 \
+              --protocol "-1" \
+              --port all \
               --cidr 0.0.0.0/0
           fi
 
