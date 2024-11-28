@@ -45,11 +45,11 @@ module "eks" {
   #  }
 }
 
-#module "ecr" {
-#  source = "./modules/ecr"
-#
-#  ecr_repositories_names = var.applications
-#}
+module "ecr" {
+  source = "./modules/ecr"
+
+  ecr_repositories_names = var.applications
+}
 
 
 #module "docker_build_push" {
