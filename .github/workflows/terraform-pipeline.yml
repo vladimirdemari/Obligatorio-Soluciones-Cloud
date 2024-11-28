@@ -84,8 +84,7 @@ jobs:
         id: extract-ecr
         working-directory: terraform/modules/ecr
         run: |
-          REGISTRY_URL=$(terraform output -raw registry_url)
-          echo "REGISTRY_URL=$REGISTRY_URL" >> $GITHUB_ENV
+          echo "::set-output name=registry_url::$(terraform output -raw registry_url)"
 
   terraform-deploy:
     name: Terraform Deployment
@@ -96,7 +95,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
       S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
-      REGISTRY_URL: ${{ env.REGISTRY_URL }}
       TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
       TF_VAR_environment_name: ${{ vars.TF_VAR_environment_name }}
       TF_VAR_vpc_cidr: ${{ vars.TF_VAR_vpc_cidr }}
@@ -108,12 +106,13 @@ jobs:
       TF_VAR_applications: ${{ vars.TF_VAR_applications }}
       TF_VAR_commit_short_sha: ${{ vars.TF_VAR_commit_short_sha }}
       TF_VAR_docker_url: ${{ vars.TF_VAR_docker_url }}
+      TF_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
 
     steps:
       - name: Authenticate Docker with ECR
         run: |
           echo "Authenticating with ECR at $ECR_URL"
-          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "$REGISTRY_URL"
+          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "$TF_REGISTRY_URL"
 
       - name: Checkout Repository
         uses: actions/checkout@v3
