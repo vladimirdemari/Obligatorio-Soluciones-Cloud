@@ -11,14 +11,14 @@ resource "aws_security_group" "cluster" {
     self        = true
   }
 
-  ingress {
-    description = "Permitir el acceso a la API de Kubernetes desde el Bastion"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups = ["sg-03958d92039660269"]
+#  ingress {
+#    description = "Permitir el acceso a la API de Kubernetes desde el Bastion"
+#    from_port   = 443
+#    to_port     = 443
+#    protocol    = "tcp"
+#    security_groups = ["sg-03958d92039660269"]
 #    security_groups = [module.bastion.security_group_id]
-  }
+#  }
 
   egress {
     description = "Permitir salida"
