@@ -162,25 +162,37 @@ jobs:
           SUBNET_ID=$(echo $PRIVATE_SUBNET_IDS | jq -r '.[0]')
           echo "SUBNET_ID=$SUBNET_ID" >> $GITHUB_ENV
 
-          # Crea un Security Group
-          SECURITY_GROUP_ID=$(aws ec2 create-security-group \
-            --group-name github-runner-sg \
-            --description "Security group for GitHub Runner" \
-            --vpc-id $(aws ec2 describe-subnets --subnet-ids $SUBNET_ID --query 'Subnets[0].VpcId' --output text) \
-            --query 'GroupId' --output text)
+          # Verifica si el Security Group ya existe
+          SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
+            --filters Name=group-name,Values=github-runner-sg Name=vpc-id,Values=$(aws ec2 describe-subnets --subnet-ids $SUBNET_ID --query 'Subnets[0].VpcId' --output text) \
+            --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)
+
+          if [ -z "$SECURITY_GROUP_ID" ]; then
+            # Crea un Security Group si no existe
+            echo "Security group 'github-runner-sg' no existe. Creando..."
+            SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+              --group-name github-runner-sg \
+              --description "Security group for GitHub Runner" \
+              --vpc-id $(aws ec2 describe-subnets --subnet-ids $SUBNET_ID --query 'Subnets[0].VpcId' --output text) \
+              --query 'GroupId' --output text)
+          else
+            echo "Security group 'github-runner-sg' ya existe. Usando el existente."
+          fi
+
           echo "SECURITY_GROUP_ID=$SECURITY_GROUP_ID" >> $GITHUB_ENV
 
-          # Configura reglas de tráfico
+          # Configura reglas de tráfico para el Security Group
           aws ec2 authorize-security-group-ingress \
             --group-id $SECURITY_GROUP_ID \
             --protocol tcp \
             --port 443 \
-            --source-group $SECURITY_GROUP_ID
+            --source-group $SECURITY_GROUP_ID || true
+
           aws ec2 authorize-security-group-ingress \
             --group-id $SECURITY_GROUP_ID \
             --protocol tcp \
             --port 22 \
-            --cidr 0.0.0.0/0
+            --cidr 0.0.0.0/0 || true
 
       - name: Launch EC2 Instance with User Data
         id: launch-ec2
