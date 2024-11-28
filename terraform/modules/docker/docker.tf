@@ -6,7 +6,7 @@ resource "docker_image" "build" {
   name = "${var.registry_url}/${each.key}:${var.commit_short_sha}"
 
   build {
-    context    = "../butique-online/src/${each.key}"
+    context    = "../boutique-online/src/${each.key}"
   }
 }
 
