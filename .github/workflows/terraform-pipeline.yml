@@ -109,6 +109,10 @@ jobs:
       TF_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
 
     steps:
+      - name: Verify Docker Installation
+        run: |
+          docker --version || echo "Docker is not installed or not accessible"
+
       - name: Authenticate Docker with ECR
         run: |
           echo "Authenticating with ECR at $ECR_URL"
