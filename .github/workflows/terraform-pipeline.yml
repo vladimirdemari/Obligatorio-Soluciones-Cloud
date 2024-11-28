@@ -75,7 +75,8 @@ jobs:
                          -backend-config="key=terraform/ecr-state" \
                          -backend-config="region=$TF_VAR_aws_region" \
                          -backend-config="encrypt=true" \
-                         -backend-config="dynamodb_table=my-terraform-lock-table"
+                         -backend-config="dynamodb_table=my-terraform-lock-table" \
+                         -force-copy
 
       - name: Apply Terraform for ECR
         working-directory: terraform/modules/ecr
