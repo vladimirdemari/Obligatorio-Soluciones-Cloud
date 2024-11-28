@@ -1,3 +1,8 @@
+variable "aws_region" {
+  description = "Región de AWS"
+  type        = string
+}
+
 variable "applications" {
   description = "Nombres de repositorios para Elastic Container Registry (ECR)"
   type        = list(string)
