@@ -24,6 +24,14 @@ resource "docker_tag" "latest" {
 
   # Imagen destino con el tag `latest`
   target_image = "${var.registry_url}/${each.key}:latest"
+
+  # Ignorar cambios en atributos relacionados con la imagen fuente
+  lifecycle {
+    ignore_changes = [
+      source_image,
+      source_image_id,
+    ]
+  }
 }
 
 # Push del tag `<commit_short_sha>`
