@@ -44,7 +44,7 @@ jobs:
       # 4. Plan Terraform Changes
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -var-file="variables.tfvars"
+        run: terraform plan
 
       - name: Terraform Apply
         working-directory: terraform
