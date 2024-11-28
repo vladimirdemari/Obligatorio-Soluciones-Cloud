@@ -10,7 +10,7 @@ deploy:
 	@for manifest in $(DEPLOYMENTS); do \
 		COMPONENT=$$(echo $$manifest | cut -d '/' -f 1); \
 		echo "Applying $$manifest with COMPONENT=$$COMPONENT"; \
-		REGISTRY_URL=$(REGISTRY_URL) COMPONENT=$$COMPONENT envsubst '$${REGISTRY_URL} $${COMPONENT}' < $$manifest | kubectl apply -f -; \
+		TF_VAR_REGISTRY_URL=$(TF_VAR_REGISTRY_URL) COMPONENT=$$COMPONENT envsubst '$${TF_VAR_REGISTRY_URL} $${COMPONENT}' < $$manifest | kubectl apply -f -; \
 	done
 
 # Regla para eliminar todos los recursos
@@ -19,6 +19,6 @@ clean:
 	@for manifest in $(DEPLOYMENTS); do \
 		COMPONENT=$$(echo $$manifest | cut -d '/' -f 1); \
 		echo "Deleting $$manifest with COMPONENT=$$COMPONENT"; \
-		REGISTRY_URL=$(REGISTRY_URL) COMPONENT=$$COMPONENT envsubst '$${REGISTRY_URL} $${COMPONENT}' < $$manifest | kubectl delete -f -; \
+		TF_VAR_REGISTRY_URL=$(TF_VAR_REGISTRY_URL) COMPONENT=$$COMPONENT envsubst '$${TF_VAR_REGISTRY_URL} $${COMPONENT}' < $$manifest | kubectl delete -f -; \
 	done
 
