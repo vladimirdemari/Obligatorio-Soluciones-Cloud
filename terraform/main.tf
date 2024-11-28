@@ -3,9 +3,9 @@ module "vpc" {
   aws_region           = var.aws_region
   environment_name     = var.environment_name
   vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  availability_zones   = var.availability_zones
+  public_subnet_cidrs  = jsondecode(var.public_subnet_cidrs)
+  private_subnet_cidrs = jsondecode(var.private_subnet_cidrs)
+  availability_zones   = jsondecode(var.availability_zones)
 }
 
 module "eks" {
@@ -44,7 +44,7 @@ module "eks" {
 module "ecr" {
   source = "./modules/ecr"
 
-  ecr_repositories_names = var.applications
+  ecr_repositories_names = jsondecode(var.applications)
 }
 
 
