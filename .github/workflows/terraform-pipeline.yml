@@ -139,6 +139,7 @@ jobs:
   create-private-runner:
     name: Create Private Runner
     runs-on: ubuntu-latest
+    needs: terraform-deploy
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -146,7 +147,7 @@ jobs:
       TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
       PRIVATE_SUBNET_IDS: ${{ vars.PRIVATE_SUBNET_IDS }}
       RUNNER_TOKEN: ${{ secrets.RUNNER_TOKEN }}
-      INSTANCE_TYPE: "t3.micro" # Cambia según tus necesidades
+      INSTANCE_TYPE: "t3.micro"
     steps:
       - name: Configure AWS CLI
         run: |
@@ -172,8 +173,14 @@ jobs:
           # Configura reglas de tráfico
           aws ec2 authorize-security-group-ingress \
             --group-id $SECURITY_GROUP_ID \
-            --protocol all \
-            --cidr 10.0.0.0/16
+            --protocol tcp \
+            --port 443 \
+            --source-group $SECURITY_GROUP_ID
+          aws ec2 authorize-security-group-ingress \
+            --group-id $SECURITY_GROUP_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr 0.0.0.0/0
 
       - name: Launch EC2 Instance with User Data
         id: launch-ec2
@@ -183,22 +190,22 @@ jobs:
           #!/bin/bash
           set -e
           sudo apt-get update -y
-          sudo apt-get install -y docker.io git
+          sudo apt-get install -y docker.io git jq
           sudo systemctl start docker
           sudo systemctl enable docker
 
           # Configurar GitHub Runner
           mkdir actions-runner && cd actions-runner
-          curl -o actions-runner-linux-x64-2.303.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.303.0/actions-runner-linux-x64-2.303.0.tar.gz
-          tar xzf actions-runner-linux-x64-2.303.0.tar.gz
-          ./config.sh --url https://github.com/YOUR_ORG/YOUR_REPO --token $RUNNER_TOKEN --labels private-runner
+          curl -o actions-runner-linux-x64-2.321.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
+          tar xzf actions-runner-linux-x64-2.321.0.tar.gz
+          ./config.sh --url https://github.com/vladimirdemari/Obligatorio-Soluciones-Cloud --token $RUNNER_TOKEN --labels private-runner
           ./svc.sh install
           ./svc.sh start
           EOF
           )
 
           INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0dba2cb6798deb6d8 \
+            --image-id ami-0dba2cb6798deb6d8 \ # Ubuntu Server 20.04 LTS
             --count 1 \
             --instance-type $INSTANCE_TYPE \
             --subnet-id $SUBNET_ID \
