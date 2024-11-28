@@ -20,9 +20,10 @@ jobs:
           aws-region: ${{ vars.TF_VAR_aws_region }}
 
       - name: Check if S3 Bucket Exists
+        env:
+          BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          REGION: ${{ vars.TF_VAR_aws_region }}
         run: |
-          BUCKET_NAME="${{ vars.S3_BUCKET_NAME }}"
-          REGION="${{ vars.TF_VAR_aws_region }}"
           if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             echo "Bucket $BUCKET_NAME already exists. Skipping creation."
           else
@@ -55,6 +56,13 @@ jobs:
     needs: setup-state-storage
     outputs:
       registry_url: ${{ steps.extract-ecr.outputs.registry_url }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
+      S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_applications: ${{ vars.TF_VAR_applications }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -62,9 +70,9 @@ jobs:
       - name: Initialize Terraform for ECR with S3 Backend
         working-directory: terraform/modules/ecr
         run: |
-          terraform init -backend-config="bucket=${{ vars.S3_BUCKET_NAME }}" \
+          terraform init -backend-config="bucket=$S3_BUCKET_NAME" \
                          -backend-config="key=terraform/ecr-state" \
-                         -backend-config="region=${{ vars.TF_VAR_aws_region }}" \
+                         -backend-config="region=$TF_VAR_aws_region" \
                          -backend-config="encrypt=true" \
                          -backend-config="dynamodb_table=my-terraform-lock-table"
 
@@ -85,10 +93,27 @@ jobs:
     outputs:
       vpc_id: ${{ steps.export-terraform.outputs.vpc_id }}
       private_subnet_ids: ${{ steps.export-terraform.outputs.private_subnet_ids }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
+      TF_VAR_environment_name: ${{ vars.TF_VAR_environment_name }}
+      TF_VAR_vpc_cidr: ${{ vars.TF_VAR_vpc_cidr }}
+      TF_VAR_public_subnet_cidrs: ${{ vars.TF_VAR_public_subnet_cidrs }}
+      TF_VAR_private_subnet_cidrs: ${{ vars.TF_VAR_private_subnet_cidrs }}
+      TF_VAR_availability_zones: ${{ vars.TF_VAR_availability_zones }}
+      TF_VAR_cluster_name: ${{ vars.TF_VAR_cluster_name }}
+      TF_VAR_cluster_version: ${{ vars.TF_VAR_cluster_version }}
+      TF_VAR_applications: ${{ vars.TF_VAR_applications }}
+      TF_VAR_commit_short_sha: ${{ vars.TF_VAR_commit_short_sha }}
+      TF_VAR_docker_url: ${{ vars.TF_VAR_docker_url }}
+      TF_VAR_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
     steps:
       - name: Authenticate Docker with ECR
         run: |
-          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "${{ needs.setup-ecr.outputs.registry_url }}"
+          aws ecr get-login-password --region "${{ vars.TF_VAR_aws_region }}" | docker login --username AWS --password-stdin "$TF_VAR_REGISTRY_URL"
 
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -128,8 +153,6 @@ jobs:
       TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
       RUNNER_TOKEN: ${{ secrets.RUNNER_TOKEN }}
       INSTANCE_TYPE: "t3.micro"
-    outputs:
-      instance_id: ${{ steps.launch-ec2.outputs.instance_id }}
     steps:
       - name: Configure AWS CLI
         run: |
@@ -138,11 +161,8 @@ jobs:
           aws configure set region $TF_VAR_aws_region
 
       - name: Select Subnet and Create Security Group
-        id: sg-setup
         run: |
           SUBNET_ID=$(echo '${{ needs.terraform-deploy.outputs.private_subnet_ids }}' | jq -r '.[0]')
-          echo "subnet_id=$SUBNET_ID" >> $GITHUB_OUTPUT
-
           SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
             --filters Name=group-name,Values=github-runner-sg Name=vpc-id,Values=${{ needs.terraform-deploy.outputs.vpc_id }} \
             --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)
@@ -154,7 +174,6 @@ jobs:
               --vpc-id ${{ needs.terraform-deploy.outputs.vpc_id }} \
               --query 'GroupId' --output text)
           fi
-          echo "security_group_id=$SECURITY_GROUP_ID" >> $GITHUB_OUTPUT
 
           aws ec2 authorize-security-group-ingress \
             --group-id $SECURITY_GROUP_ID \
@@ -169,7 +188,6 @@ jobs:
             --cidr 0.0.0.0/0 || true
 
       - name: Launch EC2 Instance with User Data
-        id: launch-ec2
         run: |
           USER_DATA=$(cat <<EOF
           #!/bin/bash
@@ -190,12 +208,11 @@ jobs:
             --image-id ami-0dba2cb6798deb6d8 \
             --count 1 \
             --instance-type $INSTANCE_TYPE \
-            --subnet-id ${{ steps.sg-setup.outputs.subnet_id }} \
-            --security-group-ids ${{ steps.sg-setup.outputs.security_group_id }} \
+            --subnet-id $SUBNET_ID \
+            --security-group-ids $SECURITY_GROUP_ID \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=GitHub-Runner}]' \
             --user-data "$USER_DATA" \
             --query 'Instances[0].InstanceId' \
             --output text)
 
-          echo "instance_id=$INSTANCE_ID" >> $GITHUB_OUTPUT
           aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
