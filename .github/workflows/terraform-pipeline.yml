@@ -167,7 +167,6 @@ jobs:
 
         run: |
           aws eks update-kubeconfig --region ${{ vars.TF_VAR_aws_region }} --name ${{ vars.TF_VAR_cluster_name }}
-          kubectl config view
           
       - name: Install make
         run: |
