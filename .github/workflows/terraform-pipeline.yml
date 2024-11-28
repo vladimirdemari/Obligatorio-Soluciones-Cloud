@@ -70,6 +70,7 @@ jobs:
       - name: Initialize Terraform for ECR with S3 Backend
         working-directory: terraform/modules/ecr
         run: |
+          rm -f terraform.tfstate terraform.tfstate.backup
           terraform init -backend-config="bucket=$S3_BUCKET_NAME" \
                          -backend-config="key=terraform/ecr-state" \
                          -backend-config="region=$TF_VAR_aws_region" \
@@ -124,6 +125,7 @@ jobs:
       - name: Initialize Terraform for Main Deployment with S3 Backend
         working-directory: terraform
         run: |
+          rm -f terraform.tfstate terraform.tfstate.backup
           terraform init -backend-config="bucket=${{ vars.S3_BUCKET_NAME }}" \
                          -backend-config="key=terraform/main-state" \
                          -backend-config="region=${{ vars.TF_VAR_aws_region }}" \
