@@ -159,10 +159,16 @@ jobs:
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $TF_VAR_aws_region
-
+          
       - name: Select Subnet and Create Security Group
         run: |
           SUBNET_ID=$(echo '${{ needs.terraform-deploy.outputs.private_subnet_ids }}' | jq -r '.[0]')
+          
+          if [ -z "$SUBNET_ID" ]; then
+            echo "Error: SUBNET_ID is empty or not defined"
+            exit 1
+          fi
+
           SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
             --filters Name=group-name,Values=github-runner-sg Name=vpc-id,Values=${{ needs.terraform-deploy.outputs.vpc_id }} \
             --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)
@@ -175,17 +181,31 @@ jobs:
               --query 'GroupId' --output text)
           fi
 
-          aws ec2 authorize-security-group-ingress \
-            --group-id $SECURITY_GROUP_ID \
-            --protocol tcp \
-            --port 443 \
-            --source-group $SECURITY_GROUP_ID || true
+          EXISTS_443=$(aws ec2 describe-security-groups \
+            --group-ids $SECURITY_GROUP_ID \
+            --query "SecurityGroups[0].IpPermissions[?FromPort==`443` && ToPort==`443`].UserIdGroupPairs[?GroupId=='$SECURITY_GROUP_ID']" \
+            --output text)
 
-          aws ec2 authorize-security-group-ingress \
-            --group-id $SECURITY_GROUP_ID \
-            --protocol tcp \
-            --port 22 \
-            --cidr 0.0.0.0/0 || true
+          if [ -z "$EXISTS_443" ]; then
+            aws ec2 authorize-security-group-ingress \
+              --group-id $SECURITY_GROUP_ID \
+              --protocol tcp \
+              --port 443 \
+              --source-group $SECURITY_GROUP_ID
+          fi
+
+          EXISTS_22=$(aws ec2 describe-security-groups \
+            --group-ids $SECURITY_GROUP_ID \
+            --query "SecurityGroups[0].IpPermissions[?FromPort==`22` && ToPort==`22`].IpRanges[?CidrIp=='0.0.0.0/0']" \
+            --output text)
+
+          if [ -z "$EXISTS_22" ]; then
+            aws ec2 authorize-security-group-ingress \
+              --group-id $SECURITY_GROUP_ID \
+              --protocol tcp \
+              --port 22 \
+              --cidr 0.0.0.0/0
+          fi
 
       - name: Launch EC2 Instance with User Data
         run: |
