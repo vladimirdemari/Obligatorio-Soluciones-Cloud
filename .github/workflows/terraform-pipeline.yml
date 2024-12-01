@@ -60,9 +60,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-      TF_VAR_AWS_REGION: ${{ vars.TF_VAR_aws_region }}
+      TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
       S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
-      TF_VAR_APPLICATIONS: ${{ vars.TF_VAR_applications }}
+      TF_VAR_applications: ${{ vars.TF_VAR_applications }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
