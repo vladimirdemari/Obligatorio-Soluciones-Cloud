@@ -3,7 +3,8 @@ resource "aws_vpc" "oisc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags = {
+
+  tags   = {
     Name = "${var.environment_name}-vpc"
   }
 }
@@ -15,7 +16,8 @@ resource "aws_subnet" "public" {
   cidr_block              = var.public_subnet_cidrs[count.index]
   availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = true
-  tags = {
+
+  tags   = {
     Name = "${var.environment_name}-public-subnet-${count.index + 1}"
   }
 }
@@ -27,7 +29,8 @@ resource "aws_subnet" "private" {
   cidr_block              = var.private_subnet_cidrs[count.index]
   availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = false
-  tags = {
+
+  tags   = {
     Name = "${var.environment_name}-private-subnet-${count.index + 1}"
   }
 }
@@ -35,7 +38,8 @@ resource "aws_subnet" "private" {
 # Tablas de Rutas Públicas
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.oisc.id
-  tags = {
+
+  tags   = {
     Name = "${var.environment_name}-public-rt"
   }
 
@@ -55,15 +59,15 @@ resource "aws_route_table_association" "public" {
 
 # Tablas de Rutas Privadas (una por AZ para resiliencia)
 resource "aws_route_table" "private" {
-  count = length(var.private_subnet_cidrs)
+  count  = length(var.private_subnet_cidrs)
   vpc_id = aws_vpc.oisc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat[count.index].id
   }
 
-  tags = {
+  tags   = {
     Name = "${var.environment_name}-private-rt-${count.index + 1}"
   }
 }

@@ -11,20 +11,20 @@ resource "aws_eks_cluster" "this" {
   }
 
   access_config {
-    authentication_mode                         = "API"
+    authentication_mode                         = var.authentication_mode
     bootstrap_cluster_creator_admin_permissions = false
   }
 
   upgrade_policy {
-    support_type = "STANDARD"
+    support_type = var.support_type
   }
 }
 
 resource "aws_eks_access_entry" "example" {
-  cluster_name      = aws_eks_cluster.this.name
+  cluster_name  = aws_eks_cluster.this.name
   principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/voclabs"
   user_name     = "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/voclabs/{{SessionName}}"
-  type              = "STANDARD"
+  type          = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "example" {
@@ -33,7 +33,7 @@ resource "aws_eks_access_policy_association" "example" {
   principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/voclabs"
 
   access_scope {
-    type       = "cluster"
+    type        = "cluster"
   }
 }
 
