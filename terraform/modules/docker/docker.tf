@@ -29,7 +29,6 @@ resource "docker_tag" "latest" {
   lifecycle {
     ignore_changes = [
       source_image,
-      source_image_id,
     ]
   }
 }

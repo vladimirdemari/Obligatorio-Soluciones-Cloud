@@ -19,12 +19,5 @@ resource "aws_eks_node_group" "managed" {
   update_config {
     max_unavailable = var.update_max_unavailable
   }
-
-#  tags = merge(
-#    {
-#      "Name" = "${var.cluster_name}-${each.key}"
-#    },
-#    each.value.additional_tags
-#  )
 }
 

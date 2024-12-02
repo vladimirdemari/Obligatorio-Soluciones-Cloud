@@ -15,19 +15,21 @@ module "vpc" {
 module "eks" {
   source = "./modules/eks"
 
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
-  role_arn        = data.aws_iam_role.labrole-arn.arn
-
-  authentication_mode = "API"
+  cluster_name        = var.cluster_name
+  cluster_version     = var.cluster_version
+  role_arn            = data.aws_iam_role.labrole-arn.arn
+  authentication_mode = var.authentication_mode
+  support_type        = var.support_type
 
   # Conexion a la red
   vpc_id          = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
   public_subnets  = module.vpc.public_subnets
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = var.cluster_endpoint_public_access
+  cluster_endpoint_private_access = var.cluster_endpoint_private_access
+
+  bastion_sg_id = [module.bastion.bastion_sg_id]
 
   node_role_arn = data.aws_iam_role.labrole-arn.arn
 
@@ -39,10 +41,6 @@ module "eks" {
       ami_type         = "AL2023_x86_64_STANDARD"
     }
   }
-
-  #  additional_tags = {
-  #    Environment = "dev"
-  #  }
 }
 
 module "docker_build_push" {
@@ -53,3 +51,13 @@ module "docker_build_push" {
   commit_short_sha = var.commit_short_sha
 }
 
+module "bastion" {
+  source = "./modules/bastion"
+
+  vpc_id = module.vpc.vpc_id
+
+  desired_capacity = 1
+  max_size         = 1
+  min_size         = 1
+  public_subnets   = module.vpc.public_subnets
+}
