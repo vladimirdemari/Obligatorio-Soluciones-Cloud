@@ -110,10 +110,10 @@ jobs:
       TF_VAR_applications: ${{ vars.TF_VAR_applications }}
       TF_VAR_commit_short_sha: ${{ vars.TF_VAR_commit_short_sha }}
       TF_VAR_REGISTRY_URL: ${{ needs.setup-ecr.outputs.registry_url }}
-      TF_VAR_AUTHENTICATION_MODE: ${{ vars.TF_VAR_AUTHENTICATION_MODE }}
-      TF_VAR_SUPPORT_TYPE: ${{ vars.TF_VAR_SUPPORT_TYPE }}
-      TF_VAR_CLUSTER_ENDPOINT_PUBLIC_ACCESS: ${{ vars.TF_VAR_CLUSTER_ENDPOINT_PUBLIC_ACCESS }}
-      TF_VAR_CLUSTER_ENDPOINT_PRIVATE_ACCESS: ${{ vars.TF_VAR_CLUSTER_ENDPOINT_PRIVATE_ACCESS }}
+      TF_VAR_authentication_mode: ${{ vars.TF_VAR_AUTHENTICATION_MODE }}
+      TF_VAR_support_type: ${{ vars.TF_VAR_SUPPORT_TYPE }}
+      TF_VAR_cluster_endpoint_public_access: ${{ vars.TF_VAR_CLUSTER_ENDPOINT_PUBLIC_ACCESS }}
+      TF_VAR_cluster_endpoint_private_access: ${{ vars.TF_VAR_CLUSTER_ENDPOINT_PRIVATE_ACCESS }}
     steps:
       - name: Authenticate Docker with ECR
         run: |
