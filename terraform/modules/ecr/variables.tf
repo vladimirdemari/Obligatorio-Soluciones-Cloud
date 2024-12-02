@@ -20,9 +20,8 @@ variable "ecr_tag_mutability" {
   default     = "IMMUTABLE"
 }
 
-variable "environment" {
-  description = "Define el entorno asociado a los recursos (Development, Production, etc.)"
+variable "environment_name" {
+  description = "Nombre del entorno (dev, staging, prod)"
   type        = string
-  default     = "Staging"
 }
 
