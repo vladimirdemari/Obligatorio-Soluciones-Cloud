@@ -46,6 +46,12 @@ variable "cluster_endpoint_private_access" {
   type        = bool
   default     = true
 }
+variable "support_type" {
+  description = "Política de actualización del clúster"
+  type        = string
+  default     = "STANDARD"
+}
+
 
 variable "eks_managed_node_group_defaults" {
   description = "Configuración predeterminada para los grupos de nodos manejados"
@@ -80,13 +86,8 @@ variable "node_role_arn" {
   type        = string
 }
 
-#variable "control_plane_subnet_ids" {
-#  description = "IDs de las subnets para el plano de control"
-#  type        = list(string)
-#}
-
-#variable "tags" {
-#  description = "Etiquetas aplicadas a los recursos"
-#  type        = map(string)
-#}
+variable "bastion_sg_id" {
+  description = "ID del Security Group asociado al bastion"
+  type        = list(string)
+}
 

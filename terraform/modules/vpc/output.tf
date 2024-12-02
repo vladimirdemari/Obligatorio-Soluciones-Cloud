@@ -13,11 +13,6 @@ output "private_subnets" {
   value       = aws_subnet.private[*].id
 }
 
-#output "security_group_id" {
-#  description = "ID del Security Group principal"
-#  value       = aws_security_group.vpc_sg.id
-#}
-
 output "nat_gateway_ids" {
   description = "IDs de los NAT Gateways creados"
   value       = aws_nat_gateway.nat[*].id

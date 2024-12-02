@@ -39,6 +39,30 @@ variable "cluster_version" {
   type        = string
 }
 
+variable "authentication_mode" {
+  description = "Modo de autenticación del clúster EKS (API o ConfigMap)"
+  type        = string
+  default     = "API"
+}
+
+variable "cluster_endpoint_public_access" {
+  description = "Habilitar acceso público al endpoint del clúster"
+  type        = bool
+  default     = false
+}
+
+variable "cluster_endpoint_private_access" {
+  description = "Habilitar acceso privado al endpoint del clúster"
+  type        = bool
+  default     = true
+}
+
+variable "support_type" {
+  description = "Política de actualización del clúster"
+  type        = string
+  default     = "STANDARD"
+}
+
 variable "applications" {
   description = "Componentes del proyecto"
   type        = list(string)
@@ -53,3 +77,4 @@ variable "registry_url" {
   description = "The Docker registry address"
   type        = string
 }
+

@@ -26,10 +26,3 @@ variable "environment" {
   default     = "Staging"
 }
 
-variable "team" {
-  description = "Equipo responsable de los recursos"
-  type        = string
-  default     = "BackendTeam"
-}
-
-

@@ -20,11 +20,6 @@ resource "aws_ecr_repository" "app_repository" {
   # Define si las etiquetas de las imágenes pueden modificarse o no
   image_tag_mutability = var.ecr_tag_mutability
 
-  # Etiquetas asociadas al repositorio para identificar su entorno y equipo responsable
-#  tags = {
-#    Environment = var.environment  # Entorno del recurso (por ejemplo: Staging, Production)
-#    Team        = var.team         # Equipo encargado de este recurso
-#  }
 }
 
 # Define una política de ciclo de vida para administrar las imágenes dentro del repositorio
@@ -55,10 +50,4 @@ resource "aws_ecr_lifecycle_policy" "app_lifecycle_policy" {
 }
 EOF
 }
-
-  # Etiquetas para organizar el recurso y asociarlo con su entorno y equipo
-#  tags = {
-#    Environment = var.environment  # Entorno del recurso (Staging, Production, etc.)
-#    Team        = var.team         # Equipo responsable del recurso
-#  }
 
