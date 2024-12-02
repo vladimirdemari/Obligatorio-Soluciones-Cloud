@@ -5,5 +5,6 @@ provider "aws" {
     tags = {
       Environment = var.environment_name
     }
+  }
 }
 
