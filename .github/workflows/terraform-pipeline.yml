@@ -63,6 +63,7 @@ jobs:
       TF_VAR_aws_region: ${{ vars.TF_VAR_aws_region }}
       S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
       TF_VAR_applications: ${{ vars.TF_VAR_applications }}
+      TF_VAR_environment_name: ${{ vars.TF_VAR_environment_name }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
